@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot {{ common_vars.wordpress_root_dir }}/wordpress
+    DirectoryIndex index.php
+
+    <Directory {{ common_vars.wordpress_root_dir }}/wordpress>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/wordpress_error.log
+    CustomLog ${APACHE_LOG_DIR}/wordpress_access.log combined
+
+    # Optional: Enable SSL (if you later plan to implement HTTPS)
+    # SSLEngine on
+    # SSLCertificateFile /etc/ssl/certs/your_cert.pem
+    # SSLCertificateKeyFile /etc/ssl/private/your_key.pem
+</VirtualHost>

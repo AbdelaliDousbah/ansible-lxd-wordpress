@@ -1,0 +1,18 @@
+db_name: wordpress
+db_user: wordpress_user
+db_password: password
+db_host: '%'
+db_privileges: 'wordpress.*:ALL'
+mysql_socket: /var/run/mysqld/mysqld.sock
+bind_address: 0.0.0.0
+wp_download_dir: /tmp
+wordpress_root_dir: /srv/www
+php_packages:
+  - php
+  - php-mysql
+  - php-curl
+  - php-xml
+  - php-gd
+  - php-mbstring
+  - php-zip
+  - php-intl

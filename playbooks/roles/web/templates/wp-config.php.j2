@@ -1,0 +1,24 @@
+<?php
+define('DB_NAME', '{{ common_vars.db_name }}');
+define('DB_USER', '{{ common_vars.db_user }}');
+define('DB_PASSWORD', '{{ common_vars.db_password }}');
+define('DB_HOST', 'db.lxd');
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
+
+/**
+ * WordPress Database Table prefix.
+ */
+$table_prefix = 'wp_';
+
+/**
+ * For developers: WordPress debugging mode.
+ */
+define('WP_DEBUG', false);
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+    define('ABSPATH', __DIR__ . '/');
+
+/** Sets up WordPress vars and included files. */
+require_once(ABSPATH . 'wp-settings.php');

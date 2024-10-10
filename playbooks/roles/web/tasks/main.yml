@@ -1,0 +1,88 @@
+---
+- name: Include common variables
+  ansible.builtin.include_vars:
+    file: "../vars/common.yml"
+    name: "common_vars"
+
+- name: Install required system dependencies
+  ansible.builtin.apt:
+    name:
+      - curl
+      - software-properties-common
+    state: present
+
+- name: Install apache2
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+  notify: Start & enable apache2 service
+
+- name: Install PHP
+  ansible.builtin.apt:
+    name: "{{ common_vars.php_packages }}"
+    state: present
+
+- name: Create home directory for WordPress
+  ansible.builtin.file:
+    path: "{{ common_vars.wordpress_root_dir }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Check if the WordPress archive already exists
+  ansible.builtin.stat:
+    path: "{{ common_vars.wp_download_dir }}/latest.tar.gz"
+  register: wp_archive
+
+- name: Download the latest WordPress archive
+  ansible.builtin.get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: "{{ common_vars.wp_download_dir }}/latest.tar.gz"
+    mode: '0644'
+  when: not wp_archive.stat.exists
+
+- name: Extract WordPress to '{{ common_vars.wordpress_root_dir }}'
+  ansible.builtin.unarchive:
+    src: "{{ common_vars.wp_download_dir }}/latest.tar.gz"
+    dest: "{{ common_vars.wordpress_root_dir }}"
+    remote_src: true
+
+- name: Set correct permissions for WordPress folder
+  ansible.builtin.file:
+    path: "{{ common_vars.wordpress_root_dir }}/wordpress"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    recurse: true
+
+- name: Deploy Apache virtual host for WordPress
+  ansible.builtin.template:
+    src: templates/wordpress.conf.j2
+    dest: /etc/apache2/sites-available/wordpress.conf
+    mode: '0644'
+
+- name: Disable the default Apache site
+  ansible.builtin.command:
+    cmd: a2dissite 000-default
+  changed_when: false
+  notify: Reload apache2 service
+
+- name: Enable the WordPress site
+  ansible.builtin.command:
+    cmd: a2ensite wordpress
+  changed_when: false
+  notify: Reload apache2 service
+
+- name: Enable the rewrite module
+  ansible.builtin.command:
+    cmd: a2enmod rewrite
+  changed_when: false
+  notify: Reload apache2 service
+
+- name: Create wp-config.php from template
+  ansible.builtin.template:
+    src: templates/wp-config.php.j2
+    dest: "{{ common_vars.wordpress_root_dir }}/wordpress/wp-config.php"
+    mode: '0644'
+  notify: Reload apache2 service
