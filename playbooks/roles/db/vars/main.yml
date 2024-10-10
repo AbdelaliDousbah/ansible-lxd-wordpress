@@ -1,0 +1,4 @@
+---
+include_vars:
+  file: "{{ role_path }}/vars/common.yml"
+  name: "common_vars"
