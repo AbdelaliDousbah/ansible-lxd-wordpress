@@ -1,0 +1,12 @@
+[all:vars]
+ansible_connection=lxd
+ansible_user=root
+ansible_become=no
+
+[local:vars]
+ansible_lxd_remote=local
+ansible_lxd_project=default
+
+[local]
+web
+db
